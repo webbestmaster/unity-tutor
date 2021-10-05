@@ -1,21 +1,23 @@
 using UnityEngine;
 using System;
 using System.Collections;
-using    System.Collections.Generic;
-    
+using System.Collections.Generic;
+using UnityEngine.EventSystems;
+
 public class GameController : MonoBehaviour
 {
-
     private CubePos nowCube = new CubePos(0, 1, 0);
 
+    public GameObject[] canvasStartPage;
     public float cubeChangePlaceSpeed = 0.5f;
     public Transform cubeToPlace;
     public GameObject cubeToCreate, allCubes;
     private Rigidbody allCubesRb;
-    private bool IsLoos;
+    private bool IsLoos, firstCube;
     private Coroutine showCubePlace;
 
-    private List<Vector3> allCubesPositions = new List<Vector3> {
+    private List<Vector3> allCubesPositions = new List<Vector3>
+    {
         new Vector3(0, 0, 0),
         new Vector3(1, 0, 0),
         new Vector3(-1, 0, 0),
@@ -42,7 +44,6 @@ public class GameController : MonoBehaviour
             SpawnPositions();
 
             yield return new WaitForSeconds(cubeChangePlaceSpeed);
-
         }
     }
 
@@ -50,27 +51,38 @@ public class GameController : MonoBehaviour
     {
         List<Vector3> positions = new List<Vector3>();
 
-        if (IsPositionEmpty(new Vector3(nowCube.x + 1, nowCube.y, nowCube.z)) && nowCube.x + 1 != cubeToPlace.position.x)
+        if (IsPositionEmpty(new Vector3(nowCube.x + 1, nowCube.y, nowCube.z)) &&
+            nowCube.x + 1 != cubeToPlace.position.x)
         {
             positions.Add(new Vector3(nowCube.x + 1, nowCube.y, nowCube.z));
         }
-        if (IsPositionEmpty(new Vector3(nowCube.x - 1, nowCube.y, nowCube.z)) && nowCube.x - 1 != cubeToPlace.position.x)
+
+        if (IsPositionEmpty(new Vector3(nowCube.x - 1, nowCube.y, nowCube.z)) &&
+            nowCube.x - 1 != cubeToPlace.position.x)
         {
             positions.Add(new Vector3(nowCube.x - 1, nowCube.y, nowCube.z));
         }
-        if (IsPositionEmpty(new Vector3(nowCube.x, nowCube.y + 1, nowCube.z)) && nowCube.y + 1 != cubeToPlace.position.y)
+
+        if (IsPositionEmpty(new Vector3(nowCube.x, nowCube.y + 1, nowCube.z)) &&
+            nowCube.y + 1 != cubeToPlace.position.y)
         {
             positions.Add(new Vector3(nowCube.x, nowCube.y + 1, nowCube.z));
         }
-        if (IsPositionEmpty(new Vector3(nowCube.x, nowCube.y - 1, nowCube.z)) && nowCube.y - 1 != cubeToPlace.position.y)
+
+        if (IsPositionEmpty(new Vector3(nowCube.x, nowCube.y - 1, nowCube.z)) &&
+            nowCube.y - 1 != cubeToPlace.position.y)
         {
             positions.Add(new Vector3(nowCube.x, nowCube.y - 1, nowCube.z));
         }
-        if (IsPositionEmpty(new Vector3(nowCube.x, nowCube.y, nowCube.z + 1)) && nowCube.z + 1 != cubeToPlace.position.z)
+
+        if (IsPositionEmpty(new Vector3(nowCube.x, nowCube.y, nowCube.z + 1)) &&
+            nowCube.z + 1 != cubeToPlace.position.z)
         {
             positions.Add(new Vector3(nowCube.x, nowCube.y, nowCube.z + 1));
         }
-        if (IsPositionEmpty(new Vector3(nowCube.x, nowCube.y, nowCube.z - 1)) && nowCube.z - 1 != cubeToPlace.position.z)
+
+        if (IsPositionEmpty(new Vector3(nowCube.x, nowCube.y, nowCube.z - 1)) &&
+            nowCube.z - 1 != cubeToPlace.position.z)
         {
             positions.Add(new Vector3(nowCube.x, nowCube.y, nowCube.z - 1));
         }
@@ -102,12 +114,26 @@ public class GameController : MonoBehaviour
     {
         if ((Input.GetMouseButtonDown(0) || Input.touchCount > 0) && cubeToPlace != null)
         {
-
 //            if !UNITY_EDITOR
-  //              if (Input.GetTouch(0).phase != TouchPhase.Began) {
-    //                return;
-      //          }
-        //    endif
+            //              if (Input.GetTouch(0).phase != TouchPhase.Began) {
+            //                return;
+            //          }
+            //    endif
+
+            if (EventSystem.current.IsPointerOverGameObject())
+            {
+                return;
+            }
+
+            if (!firstCube)
+            {
+                firstCube = true;
+
+                foreach (GameObject obj in canvasStartPage)
+                {
+                    Destroy(obj);
+                }
+            }
 
             GameObject newCube = Instantiate(
                 cubeToCreate,
@@ -158,6 +184,4 @@ struct CubePos
         y = Convert.ToInt32(pos.y);
         z = Convert.ToInt32(pos.z);
     }
-
-
 }
